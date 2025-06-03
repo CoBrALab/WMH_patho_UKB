@@ -1,0 +1,13 @@
+# Ignore everything
+*
+
+# Except scripts
+!*.sh
+!*.R
+!*.py
+!*.md
+!*.gitignore
+!*.m
+
+# ...even if they are in subdirectories
+!*/
