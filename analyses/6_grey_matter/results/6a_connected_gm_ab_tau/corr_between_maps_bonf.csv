@@ -1,0 +1,13 @@
+x,y,pearson_corr,pearson_p,pearson_p_bonf,pearson_psig,pearson_p_bonfsig,pearson_sig
+Tau PET - AB+,Periventricular,0.114570643,0.759924008,1,0,0,0
+Tau PET - AB+,Posterior,0.694945413,0.00089991,0.01079892,1,1,2
+Tau PET - AB+,Anterior,-0.632604126,0.04279572,0.513548645,1,0,1
+Amyloid PET - AB+,Periventricular,0.079027282,0.767623238,1,0,0,0
+Amyloid PET - AB+,Posterior,-0.099192571,0.720627937,1,0,0,0
+Amyloid PET - AB+,Anterior,0.003614515,0.98930107,1,0,0,0
+Amyloid PET - AB-,Periventricular,0.262452713,0.277072293,1,0,0,0
+Amyloid PET - AB-,Posterior,0.260683081,0.325967403,1,0,0,0
+Amyloid PET - AB-,Anterior,-0.436753178,0.128687131,1,0,0,0
+Tau PET - AB-,Periventricular,0.050010986,0.865113489,1,0,0,0
+Tau PET - AB-,Posterior,0.529939728,0.01569843,0.188381162,1,0,1
+Tau PET - AB-,Anterior,-0.448451862,0.142085791,1,0,0,0

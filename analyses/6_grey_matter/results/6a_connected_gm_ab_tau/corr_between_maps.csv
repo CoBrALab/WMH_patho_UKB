@@ -1,0 +1,13 @@
+x                                            ,y      ,pearson_corr           ,pearson_p
+preventad_tau_ABpos_ses02_dkt,clust1 ,0.114570643,0.759924008
+preventad_tau_ABpos_ses02_dkt,clust2 ,0.694945413,0.00089991
+preventad_tau_ABpos_ses02_dkt,clust3 ,-0.632604126,0.04279572
+preventad_AB_ABpos_ses02_dkt,clust1 ,0.079027282,0.767623238
+preventad_AB_ABpos_ses02_dkt,clust2 ,-0.099192571,0.720627937
+preventad_AB_ABpos_ses02_dkt,clust3 ,0.003614515,0.98930107
+preventad_AB_ABneg_ses02_dkt,clust1 ,0.262452713,0.277072293
+preventad_AB_ABneg_ses02_dkt,clust2 ,0.260683081,0.325967403
+preventad_AB_ABneg_ses02_dkt,clust3 ,-0.436753178,0.128687131
+preventad_tau_ABneg_ses02_dkt,clust1 ,0.050010986,0.865113489
+preventad_tau_ABneg_ses02_dkt,clust2 ,0.529939728,0.01569843
+preventad_tau_ABneg_ses02_dkt,clust3 ,-0.448451862,0.142085791

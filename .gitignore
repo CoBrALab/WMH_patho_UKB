@@ -9,5 +9,11 @@
 !*.gitignore
 !*.m
 
+# Except images and csv
+!*.png
+!*.csv
+!*.mnc
+!*.tsv
+
 # ...even if they are in subdirectories
 !*/

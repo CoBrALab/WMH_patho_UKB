@@ -1,0 +1,10 @@
+categ	clust	avg
+dementia_no_vasc	Periventricular	0.393309971
+dementia_no_vasc	Posterior	0.326690045
+dementia_no_vasc	Anterior	0.259239155
+ischemic_heart_disease	Periventricular	0.143653296
+ischemic_heart_disease	Posterior	0.140577779
+ischemic_heart_disease	Anterior	0.191396986
+stroke	Periventricular	0.298113869
+stroke	Posterior	0.339993691
+stroke	Anterior	0.464048178
