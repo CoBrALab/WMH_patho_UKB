@@ -10,7 +10,7 @@ For questions/comments, please reach out to Olivier Parent (olivier.parent@mail.
 
 # Data available
 
-Description of the files made available in data/. All files are shared in both minc and nifti format
+Description of the files made available in data/. Files are available for download as a GitHub Release. All files are shared in both minc and nifti format.
 
 Custom UK Biobank template space (T1w)
 - UKB_template: 1mm isotropic
