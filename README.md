@@ -10,12 +10,15 @@ For questions/comments, please reach out to Olivier Parent (olivier.parent@mail.
 
 # Data available
 
-Description of the files made available in data/. Files are available for download as a GitHub Release. All files are shared in both minc and nifti format.
+Description of the files made available in data/. All files are shared in both minc and nifti format.
 
 Custom UK Biobank template space (T1w)
-- UKB_template: 1mm isotropic
-- UKB_template_2mm: 2mm isotropic
+- UKB_template_T1: 1mm isotropic
+- UKB_template_T1_2mm: 2mm isotropic
 - UKB_template_mask: mask
+
+Custom UK Biobank template space (FA)
+- UKB_template_FA: 1mm isotropic
 
 Final data-driven WMH parcellation based on pathophysiology
 - WMH_parc_patho: in UKB space
