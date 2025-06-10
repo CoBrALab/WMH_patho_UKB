@@ -14,6 +14,7 @@
 !*.csv
 !*.mnc
 !*.tsv
+!*.nii.gz
 
 # ...even if they are in subdirectories
 !*/
