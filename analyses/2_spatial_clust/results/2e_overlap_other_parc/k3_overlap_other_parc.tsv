@@ -32,3 +32,15 @@ vascular	3	5	Anterior	PCA	0.00988700564971752
 vascular	3	1	Anterior	ACA	0.385641575140638
 vascular	3	0	Anterior	OOB	0
 vascular	3	9	Anterior	Ventricules	0.000153716086388441
+fiber	1	2	Periventricular	Commissural	0.205271052067709
+fiber	1	0	Periventricular	OOB	0.559456398640997
+fiber	1	1	Periventricular	Association	0.0183344591334556
+fiber	1	3	Periventricular	Projection	0.0366725091007146
+fiber	2	2	Posterior	Commissural	0.451478908544009
+fiber	2	0	Posterior	OOB	0.0915524104378594
+fiber	2	1	Posterior	Association	0.292022411953042
+fiber	2	3	Posterior	Projection	0.215507222314461
+fiber	3	2	Anterior	Commissural	0.29066749714523
+fiber	3	0	Anterior	OOB	0.0476754722241584
+fiber	3	1	Anterior	Association	0.557280118255728
+fiber	3	3	Anterior	Projection	0.410283013430169

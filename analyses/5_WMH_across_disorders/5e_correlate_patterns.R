@@ -22,6 +22,8 @@ df_ukb_prs = as.data.frame(fread("./results/5c_UKB_PRS/WMH_diff_UKB_PRS.tsv"))
 
 df_adni_dx = as.data.frame(fread("./results/5d_ADNI_dx/WMH_diff_ADNI_dx.tsv"))
 
+df_adni_abplus = as.data.frame(fread("./results/5d_ADNI_dx/WMH_diff_ADNI_abplus.tsv"))
+
 # Clean data
 
 df_ukb_dx = df_ukb_dx %>%
@@ -32,6 +34,7 @@ df_ukb_dx = df_ukb_dx %>%
         ), labels=c(
             "UKB - IHD", "UKB - Stroke", "UKB - dementia"
         ))) %>%
+    mutate(clust = factor(clust, levels=c("c1", "c2", "c3"), labels=c("Periventricular", "Posterior", "Anterior"))) %>%
     glimpse()
 
 df_ukb_prs = df_ukb_prs %>%
@@ -52,13 +55,25 @@ df_adni_dx = df_adni_dx %>%
     mutate(group = factor(group, levels=c(
         "coef_mci", "coef_ad"
     ), labels=c(
-        "ADNI - MCI", "ADNI - AD"
+        "ADNI - MCI", "ADNI - Dementia"
+    ))) %>%
+    mutate(clust = factor(clust, levels=c("c1", "c2", "c3"), labels=c("Periventricular", "Posterior", "Anterior"))) %>%
+    glimpse()
+
+df_adni_abplus = df_adni_abplus %>%
+    select(WMH_var, clust, coef_abplus) %>%
+    pivot_longer(cols=coef_abplus, names_to="group", values_to="effect") %>%
+    rename(wmh_var = "WMH_var") %>%
+    mutate(group = factor(group, levels=c(
+        "coef_abplus"
+    ), labels=c(
+        "ADNI - AB+"
     ))) %>%
     mutate(clust = factor(clust, levels=c("c1", "c2", "c3"), labels=c("Periventricular", "Posterior", "Anterior"))) %>%
     glimpse()
 
 # Merge data
-df_merge = rbind(df_ukb_dx, df_ukb_prs, df_adni_dx)
+df_merge = rbind(df_ukb_dx, df_ukb_prs, df_adni_dx, df_adni_abplus)
 
 # Calculate correlations
 results_corr = list()
@@ -85,6 +100,11 @@ for (xvar in 1:length(unique(df_merge$group))) {
 
 results_corr = do.call(rbind, results_corr)
 
+results_corr_abplus = results_corr %>%
+    filter(x_var == "ADNI - AB+")
+results_corr = results_corr %>%
+    filter(x_var != "ADNI - AB+" & y_var != "ADNI - AB+")
+
 # FDR correction
 results_corr = results_corr %>%
     mutate(
@@ -110,6 +130,9 @@ results_corr_clust$x_var <- factor(results_corr_clust$x_var, levels = ordered_va
 results_corr_clust$y_var <- factor(results_corr_clust$y_var, levels = ordered_vars)
 
 # Order correlation matrix
+
+color_scale = c(rev(colorRampPalette(brewer.pal(9, "Blues"))(255)), "white", colorRampPalette(brewer.pal(9, "Reds"))(255))
+
 corr_mat_clust = ggplot(results_corr_clust, aes(x = x_var, y = y_var, fill = coef_pearson)) +
     geom_tile(color = "white") +
     scale_fill_gradientn(name="Pearson r", colors=color_scale, values = scales::rescale(c(-1, 0, 1)), limits=c(-1,1)) +
@@ -144,3 +167,13 @@ combined_plot <- plot_grid(
 
 ggsave("./visualization/5e_correlate_patterns/corr_matrix_clust_dend.png", width=7, height=9)
 
+# Correlations with AB+ pattern
+results_corr_abplus = results_corr_abplus %>%
+    mutate(group = factor(case_when(
+        y_var %in% c("UKB - IHD", "UKB - Stroke", "UKB - CVD PRS", "UKB - Stroke PRS") ~ "Vasc",
+        y_var %in% c("UKB - dementia", "UKB - AD PRS", "ADNI - MCI", "ADNI - AD") ~ "Neuro",
+    )))
+
+results_corr_abplus %>%
+    group_by(group) %>%
+    summarise(mean_corr = mean(coef_pearson))

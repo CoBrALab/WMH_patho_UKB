@@ -92,6 +92,8 @@ for (p in 1:ncol(prs)) {
         filter(group != "mid") %>%
         mutate(group = factor(group, levels=c("high", "low")), WMH = scale(pull(., 1)))
 
+        formula = as.formula(paste("scale(WMH) ~ group"))
+
         linmod = lm(formula, df_tmp %>% mutate(group = factor(group, levels=c("low", "high"))))
         linmod = summary(linmod)
 

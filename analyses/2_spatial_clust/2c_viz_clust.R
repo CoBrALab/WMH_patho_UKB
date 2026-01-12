@@ -15,6 +15,7 @@ library(tidyverse)
 library(MRIcrotome)
 library(magrittr)
 library(viridis)
+library(broom)
 
 # Visualization tools for spatial WMH clusters
 
@@ -25,7 +26,7 @@ maps = c("MD", "ISOVF", "FA", "ICVF", "OD", "T2star", "QSM")
 
 # Mask out voxels lower than prevalence threshold
 mask=mincGetVolume("../../data/WMH_mask.mnc")
-prev = as.data.frame(fread("../tissue_prevalence/results/tissue_prevalence_after_exclusions_WMHmask_ses2.tsv"))
+prev = as.data.frame(fread("../../../WMH_micro_spatial/Analyses_nm/tissue_prevalence/results/tissue_prevalence_after_exclusions_WMHmask_ses2.tsv"))
 nawm_prev = as.numeric(prev[8,])
 wmh_prev = as.numeric(prev[9,])
 
@@ -39,7 +40,8 @@ logical_above_thres = 1:length(logical_above_thres) %in% indices_above_thres
 # Different choices of k
 clust_list = c(2,3,4,5)
 
-anatVol = mincArray(mincGetVolume("../../data/UKB_template_2mm.mnc"))
+anatVol = mincArray(mincGetVolume("../../data/UKB_template_T1_2mm.mnc"))
+results = list()
 
 for (cluster_number in clust_list) {
   
@@ -74,7 +76,7 @@ for (cluster_number in clust_list) {
   colnames(clust_no_mask) = colnames(clust_final)
   
   # Combine cluster mnc files
-  outvol <- mincGetVolume("../../data/UKB_template_2mm.mnc")
+  outvol <- mincGetVolume("../../data/UKB_template_T1_2mm.mnc")
   outvol[] <- 0
   outvol[mask > 0.5] <- clust_no_mask$cluster
   mincWriteVolume(outvol, paste0("./results/2b_spectral_clust/k",clust_number,"_all_clusters.mnc"), clobber=TRUE)
@@ -87,7 +89,7 @@ for (cluster_number in clust_list) {
   png(file=paste0("./visualization/2c_viz_clust/k",clust_number,"_all_clusters.png"), width=3000, height=3000, pointsize = 80)
   sliceSeries(nrow=3, ncol=3, begin=40, end=52, dimension=3) %>%
     anatomy(anatVol, low=10, high=140) %>%
-    overlay(mincArray(mincGetVolume(paste0("./results/k",clust_number,"_all_clusters.mnc"))),
+    overlay(mincArray(mincGetVolume(paste0("./results/2b_spectral_clust/k",clust_number,"_all_clusters.mnc"))),
             low=0, high=clust_number+1, col=color_scale) %>%
     draw(layout="row")
   dev.off()
@@ -140,7 +142,42 @@ for (cluster_number in clust_list) {
       legend.position = "none")
     ggsave(paste0("./visualization/2c_viz_clust/k",clust_number,"_allMicro_cluster",c,".png"),
            width = length(maps)+3, height = 10, dpi=300, units="in")
+
+    results[[paste0("k", clust_number, "_clust", c)]] = micro_2
+    results[[paste0("k", clust_number, "_clust", c)]]$k = clust_number
+    results[[paste0("k", clust_number, "_clust", c)]]$c = c
   }  
 }
 
+results = do.call(rbind, results)
+results = results %>%
+  mutate(k = factor(k), c = factor(c))
+
+# Variance explained by spatial clusters for every microstructural metric
+
+anovas_k3 = results %>%
+  filter(k == 3) %>%
+  group_by(micro) %>%
+  do({
+    aov_model <- aov(val ~ as.factor(c), data = .)
+    aov_tidy  <- tidy(aov_model)
+    SS_between <- aov_tidy$sumsq[aov_tidy$term == "as.factor(c)"]
+    SS_total   <- sum(aov_tidy$sumsq)
+    tibble(R2 = SS_between / SS_total)
+  }) %>%
+  ungroup() %>%
+  arrange(desc(R2))
+fwrite(anovas_k3, "./results/2c_viz_clust/micro_var_exp.tsv", row.names=FALSE, col.names=TRUE, quote=FALSE, sep="\t")
+
+
+ggplot(anovas_k3, aes(x=micro, y=R2, fill=micro)) + 
+  geom_col() +
+  geom_text(aes(label = sprintf("%.2f", R2)), vjust = -0.5, size = 8, color = "black") +
+  expand_limits(y = max(anovas_k3$R2) * 1.1) +
+  theme_classic() + 
+  labs(x="", y="Variance explained (R2)") + 
+  scale_fill_manual(name="", values=color_scale) +
+  theme(text=element_text(size=30, color="black"), plot.title=element_text(hjust=0.5, size=40),
+  legend.position = "none")
+ggsave("./visualization/2c_viz_clust/k3_var_explained.png", width=10, height=7)
 

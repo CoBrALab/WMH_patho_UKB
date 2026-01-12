@@ -1,0 +1,10 @@
+categ	clust	avg
+ischemic_heart_disease	c1	0.112512311049955
+ischemic_heart_disease	c2	0.113502769261821
+ischemic_heart_disease	c3	0.180263034556298
+stroke	c1	0.230032736984678
+stroke	c2	0.287729726542353
+stroke	c3	0.461219705452441
+dementia_no_vasc	c1	0.279117864898697
+dementia_no_vasc	c2	0.234298536176349
+dementia_no_vasc	c3	0.098749617565321

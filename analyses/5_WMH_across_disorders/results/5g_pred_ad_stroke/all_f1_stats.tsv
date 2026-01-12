@@ -1,0 +1,16 @@
+.y.	group1	group2	n1	n2	statistic	p	p.adj	p.adj.signif
+Metric	noparc_vol	pvdeep_vol	100	100	0	3.96e-18	5.94e-17	****
+Metric	noparc_vol	clust_vol	100	100	0	3.96e-18	5.94e-17	****
+Metric	noparc_vol	noparc_vol_micro	100	100	0	3.96e-18	5.94e-17	****
+Metric	noparc_vol	pvdeep_vol_micro	100	100	0	3.96e-18	5.94e-17	****
+Metric	noparc_vol	clust_vol_micro	100	100	0	3.96e-18	5.94e-17	****
+Metric	pvdeep_vol	clust_vol	100	100	13	5.85e-18	8.775e-17	****
+Metric	pvdeep_vol	noparc_vol_micro	100	100	4760	1.55e-14	2.325e-13	****
+Metric	pvdeep_vol	pvdeep_vol_micro	100	100	0	3.96e-18	5.94e-17	****
+Metric	pvdeep_vol	clust_vol_micro	100	100	0	3.96e-18	5.94e-17	****
+Metric	clust_vol	noparc_vol_micro	100	100	5047	4.33e-18	6.495e-17	****
+Metric	clust_vol	pvdeep_vol_micro	100	100	7	4.89e-18	7.335e-17	****
+Metric	clust_vol	clust_vol_micro	100	100	0	3.96e-18	5.94e-17	****
+Metric	noparc_vol_micro	pvdeep_vol_micro	100	100	0	3.96e-18	5.94e-17	****
+Metric	noparc_vol_micro	clust_vol_micro	100	100	0	3.96e-18	5.94e-17	****
+Metric	pvdeep_vol_micro	clust_vol_micro	100	100	287	1.43e-14	2.145e-13	****

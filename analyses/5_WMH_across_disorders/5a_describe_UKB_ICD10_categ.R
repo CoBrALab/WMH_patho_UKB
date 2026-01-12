@@ -16,6 +16,7 @@ library(ggrepel)
 library(cowplot)
 library(ggpubr)
 library(stringr)
+library(MRIcrotome)
 
 # Describe and plot UKB disease categories based on ICD-10 codes (category 1712; https://biobank.ndph.ox.ac.uk/showcase/label.cgi?id=1712)
 
@@ -36,7 +37,8 @@ colnames(demo) = c("ID", "Sex", "Age")
 demo = merge(inclusions, demo, by="ID", all.x=TRUE)
 demo$Sex = factor(demo$Sex, levels=c("Male", "Female"))
 
-wmh = as.data.frame(fread("../3_temporal_sustain/results/3f_clean_wmh_data/wmh_combined.tsv"))
+# wmh = as.data.frame(fread("../3_temporal_sustain/results/3f_clean_wmh_data/wmh_combined.tsv"))
+wmh = as.data.frame(fread("../../../WMH_micro_spatial/Analyses_nm/clean_wmh_data/results/spect_clust_k3/wmh_combined.tsv"))
 wmh$sex = as.factor(wmh$sex)
 
 firstocc = merge(inclusions, firstocc, by="ID", all.x=TRUE)
@@ -66,6 +68,10 @@ controls = inclusions$ID[which(!inclusions$ID %in% controls_exc$ID)]
 
 # Manually-defined categories of ICD-10 codes
 icd_codes_list <- readRDS("../../../UKB/Analyses/clean_firstocc/results/icd_codes_list.rds")
+icd_codes_list = icd_codes_list[c(
+    "tian_ischemic_heart_disease", "tian_stroke", "cust_dementia_no_vasc"
+)]
+names(icd_codes_list) = c("ischemic_heart_disease", "stroke", "dementia_no_vasc")
 
 hc_df = firstocc %>% filter(ID %in% controls) %>% distinct(ID, .keep_all=TRUE)
 hc_df$Group = "HC"
@@ -80,12 +86,18 @@ icd_dx_name = firstocc %>% distinct(icd_code, .keep_all=TRUE) %>%
 for (dx in 1:length(icd_codes_list)) {
     print(names(icd_codes_list)[dx])
 
-    plots = list()
-    i = 1
-
     # Case dataframe: ICD-10 code in disease category and participant NOT in controls
     dx_df = firstocc %>% filter(icd_code %in% icd_codes_list[[dx]] & !ID %in% controls)
     
+    if (names(icd_codes_list)[dx] == "dementia_no_vasc") {
+        comorbidities_ids = firstocc %>% filter(icd_code %in% icd_codes_list[['ischemic_heart_disease']] | icd_code %in% icd_codes_list[['stroke']]) %>% pull(ID)
+    } else if (names(icd_codes_list)[dx] == "stroke") {
+        comorbidities_ids = firstocc %>% filter(icd_code %in% icd_codes_list[['dementia_no_vasc']] | icd_code %in% icd_codes_list[['ischemic_heart_disease']]) %>% pull(ID)
+    } else if (names(icd_codes_list)[dx] == "ischemic_heart_disease") {
+        comorbidities_ids = firstocc %>% filter(icd_code %in% icd_codes_list[['dementia_no_vasc']] | icd_code %in% icd_codes_list[['stroke']]) %>% pull(ID)
+    } 
+
+    dx_df = dx_df %>% filter(!ID %in% comorbidities_ids)
     dx_df$Group="DX"
     ncol_dx_df = ncol(dx_df)
 
@@ -160,7 +172,6 @@ for (dx in 1:length(icd_codes_list)) {
         )
 
     wrap_plots(age_dist, sex_dist, time_mri_dx, dx_pie, design = layout)
-    ggsave(paste0("./visualization/5a_describe_UKB_ICD10_categ/",names(icd_codes_list)[dx],".png"), width=17, height=3*length(plots))
+    ggsave(paste0("./visualization/5a_describe_UKB_ICD10_categ/",names(icd_codes_list)[dx],".png"), width=17, height=3)
 
 }
-

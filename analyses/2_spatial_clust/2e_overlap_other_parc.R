@@ -19,7 +19,7 @@ dir.create("./results/2e_overlap_other_parc", showWarnings=FALSE)
 dir.create("./visualization/2e_overlap_other_parc", showWarnings=FALSE)
 
 # Load data
-clust_parc = mincGetVolume("./results_2_spectral_clust/k3/all_clusters.mnc")
+clust_parc = mincGetVolume("./results/2b_spectral_clust/k3_all_clusters.mnc")
 
 other_parc = list()
 # PV/deep: Based on threshold of 8mm from the ventricle
@@ -28,10 +28,13 @@ other_parc[['pv_deep']] = mincGetVolume("../../data/WMH_parc_pv_deep.mnc")
 other_parc[['lobar']] = mincGetVolume("../../data/WMH_parc_lobar.mnc")
 # Cerebral arterial territories: From https://doi.org/10.1038/s41597-022-01923-0
 other_parc[['vascular']] = mincGetVolume("../../data/WMH_parc_vascular.mnc")
+# By fiber type
+other_parc[['fiber']] = mincGetVolume("../../data/WMH_parc_fiber.mnc")
 
 other_parc[['pv_deep']][] = round(other_parc[['pv_deep']][], 1)
 other_parc[['lobar']][] = round(other_parc[['lobar']][], 1)
 other_parc[['vascular']][] = round(other_parc[['vascular']][], 1)
+other_parc[['fiber']][] = round(other_parc[['fiber']][], 1)
 
 clust_parc_labels = c("Periventricular" = 1, "Posterior" = 2, "Anterior" = 3)
 
@@ -39,6 +42,7 @@ other_parc_labels = list()
 other_parc_labels[['pv_deep']] = c("Periventricular" = 2, "Deep" = 1, "OOB" = 0)
 other_parc_labels[['lobar']] = c("Frontal" = 1, "Temporal" = 3, "Parietal" = 5, "Occipital" = 9, "Cerebellum" = 7, "Brainstem" = 11, "OOB" = 0)
 other_parc_labels[['vascular']] = c("ACA" = 1, "MCA" = 3, "PCA" = 5, "VB" = 7, "Ventricules" = 9, "OOB" = 0)
+other_parc_labels[['fiber']] = c("Association" = 1, "Commissural" = 2, "Projection" = 3, "OOB" = 0)
 
 # Calculate dice overlap between data-driven clusters and other parcellations
 
@@ -111,7 +115,7 @@ results = as.data.frame(fread("./results/2e_overlap_other_parc/k3_overlap_other_
 results %>% 
     filter(!other_parc_label %in% c("OOB", "Ventricules")) %>%
     filter(Other_parc!="pv_deep_10mm") %>%
-    mutate(Other_parc = factor(Other_parc, levels=c("pv_deep_8mm", "lobar", "vascular"), labels=c("PV/deep", "Lobar", "Vascular"))) %>%
+    mutate(Other_parc = factor(Other_parc, levels=c("pv_deep", "lobar", "vascular", "fiber"), labels=c("PV/deep", "Lobar", "Vascular", "Fiber"))) %>%
     mutate(spect_clust_label = factor(spect_clust_label, levels=c("Anterior", "Posterior", "Periventricular"))) %>%
 # Plot
   ggplot(aes(x=other_parc_label, y=spect_clust_label, fill=dice)) +

@@ -119,7 +119,8 @@ by_sensitivity = function(merged_df, spline_df, color_scale, png_name) {
 # Run
 
 # Load median WMH z-scores per subject
-df = as.data.frame(fread("../2_spatial_clust/results/2h_roi_avg/subj_WMH_patho.tsv"))
+# df = as.data.frame(fread("../2_spatial_clust/results/2h_roi_avg/subj_WMH_patho.tsv"))
+df = as.data.frame(fread("../../../WMH_micro_spatial/Analyses_nm/zscore_subject_regions/results/spect_clust_k3/subj_WMH_patho_ses2.tsv"))
 
 total_clusters = 3
 
@@ -145,3 +146,99 @@ for (c in 1:total_clusters) {
 
 }
 
+# Plots with sustain
+
+spline_df = 4
+
+df_sustain_c1 = as.data.frame(fread("../../../WMH_micro_spatial/Analyses_nm/sustain_spect_clust_k3_parc/results/c1/subtype0/comb_subj_cval_ses2.csv"))
+df_sustain_c2 = as.data.frame(fread("../../../WMH_micro_spatial/Analyses_nm/sustain_spect_clust_k3_parc/results/c2/subtype0/comb_subj_cval_ses2.csv"))
+df_sustain_c3 = as.data.frame(fread("../../../WMH_micro_spatial/Analyses_nm/sustain_spect_clust_k3_parc/results/c3/subtype0/comb_subj_cval_ses2.csv"))
+
+df_volumes = df_sustain_c1 %>%
+    select(ID, spect_clust_k3_WMHvol_c1, spect_clust_k3_WMHvol_c2, spect_clust_k3_WMHvol_c3) %>%
+    rename(WMHvol_c1 = "spect_clust_k3_WMHvol_c1", WMHvol_c2 = "spect_clust_k3_WMHvol_c2", WMHvol_c3 = "spect_clust_k3_WMHvol_c3") %>%
+    pivot_longer(cols=-ID, names_to = "Cluster", values_to = "WMHvol") %>%
+    mutate(Cluster = factor(Cluster, levels=c("WMHvol_c1", "WMHvol_c2", "WMHvol_c3"), labels=c("Periventricular", "Posterior", "Anterior"))) %>%
+    glimpse()
+
+df_sustain = df_sustain_c1 %>%
+    mutate(Cluster = "Periventricular") %>%
+    bind_rows(df_sustain_c2 %>% mutate(Cluster = "Posterior")) %>%
+    bind_rows(df_sustain_c3 %>% mutate(Cluster = "Anterior")) %>%    
+    select(ID, ml_stage_cval, Cluster) %>%
+    mutate(Cluster = factor(Cluster, levels=c("Periventricular", "Posterior", "Anterior"))) %>%
+    left_join(df_volumes, by=c("ID", "Cluster")) %>%
+    mutate(WMHvol = log(WMHvol + 1)) %>%
+    glimpse()
+
+cor_1 = cor.test(
+    df_sustain %>% filter(Cluster == "Periventricular") %>% pull(ml_stage_cval),
+    df_sustain %>% filter(Cluster == "Periventricular") %>% pull(WMHvol),
+    method = "spearman"
+    )
+
+plot1 = ggplot(data=df_sustain %>% filter(Cluster == "Periventricular"), aes(x=WMHvol, y=ml_stage_cval)) + 
+    stat_smooth(method = lm, formula = y ~ bs(x,spline_df), se=TRUE, color="black") + 
+    geom_point(alpha=0.1, size=0.1) + 
+    scale_y_continuous(breaks=seq(0,30,by=5), limits=c(0,31), name="Stage") + 
+    scale_x_continuous(breaks=seq(0,12,by=2), limits=c(0,12), name="log(WMH volume)") + 
+    theme_classic() + 
+    ggtitle("Periventricular") + 
+    theme(text=element_text(size=30, color="black"), plot.title=element_text(hjust=0.5, size=40)) +
+    annotate(
+        "text",
+        x = 8, y = 5,
+        label = paste0("rho = ", round(cor_1$estimate, 2)),
+        hjust = 0, vjust = 1,
+        size=10,
+        color = "black"
+    )
+
+cor_2 = cor.test(
+    df_sustain %>% filter(Cluster == "Posterior") %>% pull(ml_stage_cval),
+    df_sustain %>% filter(Cluster == "Posterior") %>% pull(WMHvol),
+    method = "spearman"
+    )
+
+plot2 = ggplot(data=df_sustain %>% filter(Cluster == "Posterior"), aes(x=WMHvol, y=ml_stage_cval)) + 
+    stat_smooth(method = lm, formula = y ~ bs(x,spline_df), se=TRUE, color="black") + 
+    geom_point(alpha=0.1, size=0.1) + 
+    scale_y_continuous(breaks=seq(0,30,by=5), limits=c(0,31), name="Stage") + 
+    scale_x_continuous(breaks=seq(0,12,by=2), limits=c(0,12), name="log(WMH volume)") + 
+    theme_classic() + 
+    ggtitle("Posterior") + 
+    theme(text=element_text(size=30, color="black"), plot.title=element_text(hjust=0.5, size=40)) +
+    annotate(
+        "text",
+        x = 8, y = 5,
+        label = paste0("rho = ", round(cor_2$estimate, 2)),
+        hjust = 0, vjust = 1,
+        size=10,
+        color = "black"
+    )
+
+cor_3 = cor.test(
+    df_sustain %>% filter(Cluster == "Anterior") %>% pull(ml_stage_cval),
+    df_sustain %>% filter(Cluster == "Anterior") %>% pull(WMHvol),
+    method = "spearman"
+    )
+
+plot3 = ggplot(data=df_sustain %>% filter(Cluster == "Anterior"), aes(x=WMHvol, y=ml_stage_cval)) + 
+    stat_smooth(method = lm, formula = y ~ bs(x,spline_df), se=TRUE, color="black") + 
+    geom_point(alpha=0.1, size=0.1) + 
+    scale_y_continuous(breaks=seq(0,30,by=5), limits=c(0,31), name="Stage") + 
+    scale_x_continuous(breaks=seq(0,12,by=2), limits=c(0,12), name="log(WMH volume)") + 
+    theme_classic() + 
+    ggtitle("Anterior") + 
+    theme(text=element_text(size=30, color="black"), plot.title=element_text(hjust=0.5, size=40)) +
+    annotate(
+        "text",
+        x = 8, y = 5,
+        label = paste0("rho = ", round(cor_3$estimate, 2)),
+        hjust = 0, vjust = 1,
+        size=10,
+        color = "black"
+    )
+
+wrap_plots(list(plot1, plot2, plot3))
+ggsave("./visualization/3e_WMHpatho_with_volume/sustain_with_volume.png", width = 30, height = 8, dpi=300, units="in")

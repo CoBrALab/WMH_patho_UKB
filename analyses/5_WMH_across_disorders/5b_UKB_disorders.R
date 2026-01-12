@@ -29,11 +29,16 @@ firstocc = merge(inclusions, firstocc, by="ID", all.x=TRUE)
 firstocc[,c(3,4,7,8)] = as.data.frame(lapply(firstocc[,c(3,4,7,8)], as.factor))
 firstocc[,c(2,5)] = as.data.frame(lapply(firstocc[,c(2,5)], as.Date))
 
-wmh = as.data.frame(fread("../3_temporal_sustain/results/3f_clean_wmh_data/wmh_combined.tsv"))
+# wmh = as.data.frame(fread("../3_temporal_sustain/results/3f_clean_wmh_data/wmh_combined.tsv"))
+wmh = as.data.frame(fread("../../../WMH_micro_spatial/Analyses_nm/clean_wmh_data/results/spect_clust_k3/wmh_combined.tsv"))
 wmh$sex = as.factor(wmh$sex)
 
 # Manually-defined categories of ICD-10 codes
 icd_codes_list <- readRDS("../../../UKB/Analyses/clean_firstocc/results/icd_codes_list.rds")
+icd_codes_list = icd_codes_list[c(
+    "tian_ischemic_heart_disease", "tian_stroke", "cust_dementia_no_vasc"
+)]
+names(icd_codes_list) = c("ischemic_heart_disease", "stroke", "dementia_no_vasc")
 
 # Make control group: no lifetime dx on endocrine, mental, nervous, circulatory systems
 # Exceptions
@@ -45,9 +50,11 @@ fwrite(as.data.frame(controls_exc_dx), "dx_prevalence.csv")
 
 # dx to keep in controls (high prev and low impact on brain):
 # depressive episode (F32; n=4163), migraine (G43; n=2632), other anxiety disorders (F41; n=2632), haemorrhoids (I84; n=1859)
-controls_exc = controls_exc %>% filter(!icd_code %in% c("F32", "G43", "F41", "I84"))
+# controls_exc = controls_exc %>% filter(!icd_code %in% c("F32", "G43", "F41", "I84"))
+# controls_exc = controls_exc %>% filter(!icd_code %in% c("G43", "I84"))
 
 controls = inclusions$ID[which(!inclusions$ID %in% controls_exc$ID)]
+print(length(controls))
 
 # Differences betwen cases and controls controling for age and sex
 
@@ -61,7 +68,21 @@ for (dx in 1:length(icd_codes_list)) {
     print(names(icd_codes_list)[dx])
 
     # Case dataframe: ICD-10 code in disease category and participant NOT in controls
-    dx_ids = firstocc %>% filter(icd_code %in% icd_codes_list[[dx]]) %>% pull(ID)
+    dx_ids = firstocc %>% filter(icd_code %in% icd_codes_list[[dx]])
+
+    if (names(icd_codes_list)[dx] == "dementia_no_vasc") {
+        comorbidities_ids = firstocc %>% filter(icd_code %in% icd_codes_list[['ischemic_heart_disease']] | icd_code %in% icd_codes_list[['stroke']]) %>% pull(ID)
+    } else if (names(icd_codes_list)[dx] == "stroke") {
+        comorbidities_ids = firstocc %>% filter(icd_code %in% icd_codes_list[['dementia_no_vasc']] | icd_code %in% icd_codes_list[['ischemic_heart_disease']]) %>% pull(ID)
+    } else if (names(icd_codes_list)[dx] == "ischemic_heart_disease") {
+        comorbidities_ids = firstocc %>% filter(icd_code %in% icd_codes_list[['dementia_no_vasc']] | icd_code %in% icd_codes_list[['stroke']]) %>% pull(ID)
+    } 
+
+    dx_ids = dx_ids %>% filter(!ID %in% comorbidities_ids) %>% pull(ID)
+
+    # Remove ppl with comorbidities (eg remove stroke from dementia group)
+
+
     dx_df = as.data.frame(wmh[which(!wmh$ID %in% controls),])
     dx_df = dx_df[which(dx_df$ID %in% dx_ids),]
     n_dx_tmp = nrow(dx_df)
@@ -70,7 +91,7 @@ for (dx in 1:length(icd_codes_list)) {
     ncol_dx_df = ncol(dx_df)
 
     firstocc_df = firstocc %>% filter(icd_code %in% icd_codes_list[[dx]])
-    dx_df = merge(dx_df, firstocc_df, by="ID")
+    dx_df = merge(dx_df, firstocc_df, by="ID")    
 
     # dx_df can contains duplicates because of commorbidities in the same category
     # Still want to visualize the breakdown of all dx, but get the total n from unique values
@@ -80,7 +101,7 @@ for (dx in 1:length(icd_codes_list)) {
     hc_dx_df$Group = as.factor(hc_dx_df$Group)
 
     hc_dx_df_unique = rbind(hc_df, dx_df_unique[,seq(1,ncol_dx_df)])
-    hc_dx_df_unique$Group = as.factor(hc_dx_df_unique$Group)
+    hc_dx_df_unique$Group = factor(hc_dx_df_unique$Group, levels=c("HC", "DX"))
     
     # For every WMH measure
     for (w in c(seq(4,9), seq(12, 32))) {
@@ -132,7 +153,7 @@ results = results %>% mutate(wmh_var = factor(wmh_var, levels=metrics), clust = 
 
 names=c("WMHvol", "stage", "MD", "ISOVF", "FA", "ICVF", "OD", "T2star", "QSM")
 
-anatVol = mincArray(mincGetVolume("../../data/UKB_template_2mm.mnc"))
+anatVol = mincArray(mincGetVolume("../../data/UKB_template_T1_2mm.mnc"))
 viridis_scale = viridis(n=255, option="B")
 color_scale_div_2 = colorRampPalette(brewer.pal(9,"Blues"))(255)
 color_scale_div_1 = colorRampPalette(brewer.pal(9,"Reds"))(255)
@@ -141,7 +162,7 @@ for (dx_i in 1:length(levels(results$categ))) {
 
     # Results to mnc
     effects_mnc = list()
-    mnc_parc = mincGetVolume("../../2_spatial_clust/results/2d_assign_excluded_voxels/final_parc_k3.mnc")
+    mnc_parc = mincGetVolume("../2_spatial_clust/results/2d_assign_excluded_voxels/final_parc_k3.mnc")
 
     for (n in 1:length(names)) {
 

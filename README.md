@@ -4,6 +4,8 @@ Analysis code for the manuscript "Characterizing spatiotemporal white matter hyp
 
 We share all analysis code, code used for generating plots, group-level raw results (e.g., 3D volume maps for spatial clusters, linear model outputs, etc.) and visualizations included in the paper.
 
+To run the code, the user needs to assign the working directory to the directory of the script (e.g., analyses/1_norm_mod), load the required dependencies (see below), and then run each script in order.
+
 No individual-level data from UKB or ADNI can be shared for confidentiality reasons.
 
 For questions/comments, please reach out to Olivier Parent (olivier.parent@mail.mcgill.ca)
@@ -33,4 +35,14 @@ Other WMH parcellation used for comparisons (all in UKB space)
 - WMH_parc_vascular: parcellation of arterial territories (from Liu et al., 2023, Scientific Data, https://doi.10.1038/s41597-022-01923-0)
 - WMH_parc_lobar: lobar parcellation
 - WMH_parc_pv_deep: periventricular/deep parcellation
+- WMH_parc_fiber: fiber type atlas
+
+# Dependencies
+
+- R/4.1.2
+- python/3.9.8
+- PCNtoolkit/0.35 (python package; https://github.com/amarquand/PCNtoolkit)
+- Spectrum/v1.1 (R package; https://cran.r-project.org/package=Spectrum)
+- pySuStaIn (python package; https://github.com/ucl-pond/pySuStaIn)
+- neuromaps (python package; https://github.com/netneurolab/neuromaps)
 
