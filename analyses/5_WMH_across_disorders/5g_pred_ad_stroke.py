@@ -424,17 +424,6 @@ def fit_repeated_cv(X, y, n_repeats=100, cv=5):
     first_repeat_y_true = np.array(first_repeat_y_true)
     first_repeat_y_pred = np.array(first_repeat_y_pred)
     first_repeat_y_pred_proba = np.array(first_repeat_y_pred_proba)
-    # Fit final model on complete sample
-    model = LogisticRegression(
-        penalty='l1',
-        C=1.0,
-        solver='saga',
-        class_weight='balanced',  # HANDLES CLASS IMBALANCE
-        max_iter=1000,
-        random_state=42,
-        n_jobs=-1
-    )
-    model.fit(X, y)
     # Print summary statistics across all repeats
     print("\n" + "-"*60)
     print(f"SUMMARY ACROSS {n_repeats} REPEATS")
@@ -445,9 +434,8 @@ def fit_repeated_cv(X, y, n_repeats=100, cv=5):
         print(f"  Mean: {np.mean(scores):.4f}")
         print(f"  Std:  {np.std(scores):.4f}")
         print(f"  95% CI: [{np.percentile(scores, 2.5):.4f}, {np.percentile(scores, 97.5):.4f}]")
-    return (model, first_repeat_y_true, first_repeat_y_pred, first_repeat_y_pred_proba, 
+    return (first_repeat_y_true, first_repeat_y_pred, first_repeat_y_pred_proba, 
             all_repeat_metrics)
-
 
 #endregion
 
@@ -456,127 +444,37 @@ def fit_repeated_cv(X, y, n_repeats=100, cv=5):
 ################# Spect_clust_k3
 
 # Volumes + micro
-model_clust, y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_clust, y_clust, cv=5, model_type='lasso')
+y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_clust, y_clust, cv=5, model_type='lasso')
 df_metrics = pd.DataFrame(fold_metrics)
 df_metrics.to_csv("./results/5g_pred_ad_stroke/spect_clust_k3_micro_metrics.csv", index=False)
 
 # Volumes only
-model_clust_vol, y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_clust_vol, y_clust, cv=5, model_type='lasso')
+y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_clust_vol, y_clust, cv=5, model_type='lasso')
 df_metrics = pd.DataFrame(fold_metrics)
 df_metrics.to_csv("./results/5g_pred_ad_stroke/spect_clust_k3_vol_metrics.csv", index=False)
 
 ################# PV/deep
 
 # Volumes + micro
-model_pvdeep, y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_pvdeep, y_pvdeep, cv=5, model_type='lasso')
+y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_pvdeep, y_pvdeep, cv=5, model_type='lasso')
 df_metrics = pd.DataFrame(fold_metrics)
 df_metrics.to_csv("./results/5g_pred_ad_stroke/pv_deep_micro_metrics.csv", index=False)
 
 # Volumes only
-model_pvdeep_vol, y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_pvdeep_vol, y_pvdeep, cv=5, model_type='lasso')
+y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_pvdeep_vol, y_pvdeep, cv=5, model_type='lasso')
 df_metrics = pd.DataFrame(fold_metrics)
 df_metrics.to_csv("./results/5g_pred_ad_stroke/pv_deep_vol_metrics.csv", index=False)
 
 ################# No parcellation
 
 # Volumes + micro
-model_noparc, y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_noparc, y_noparc, cv=5, model_type='lasso')
+y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_noparc, y_noparc, cv=5, model_type='lasso')
 df_metrics = pd.DataFrame(fold_metrics)
 df_metrics.to_csv("./results/5g_pred_ad_stroke/noparc_micro_metrics.csv", index=False)
 
 # Volumes only
-model_noparc_vol, y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_noparc_vol.reshape(-1,1), y_noparc, cv=5)
+y_true, y_pred, y_pred_proba, fold_metrics = fit_repeated_cv(X_noparc_vol.reshape(-1,1), y_noparc, cv=5)
 df_metrics = pd.DataFrame(fold_metrics)
 df_metrics.to_csv("./results/5g_pred_ad_stroke/noparc_vol_metrics.csv", index=False)
-
-#endregion
-
-#region Predict high PRS
-
-def pred_predict(model, X, y):
-    # Predict
-    prs_proba = model.predict_proba(X)
-    prs_pred = model.predict(X)
-    # Print accuracy scores
-    metrics = {
-        "accuracy": accuracy_score(y, prs_pred),
-        "balanced_accuracy": balanced_accuracy_score(y, prs_pred),
-        "precision": precision_score(y, prs_pred, zero_division=0),
-        "recall": recall_score(y, prs_pred, zero_division=0),
-        "f1": f1_score(y, prs_pred, zero_division=0),
-        "roc_auc": roc_auc_score(y, prs_proba[:, 1]),
-    }
-    print(metrics)
-    return pd.DataFrame([metrics])
-
-# Load prs
-df_prs = pd.read_csv("../assoc_PRS/results/prs.tsv", sep="\t")
-ids_prs_ad = df_prs.loc[df_prs['alzheimer_s_disease'] >= df_prs['alzheimer_s_disease'].quantile(0.99), 'ID']
-ids_prs_stroke = df_prs.loc[df_prs['ischaemic_stroke'] >= df_prs['ischaemic_stroke'].quantile(0.99), 'ID']
-
-# Exclude IDs in train set (AD or stroke dx) and common IDs (both high PRS of stroke and AD)
-
-exclude = (
-    set(ids_prs_ad) & set(ids_prs_stroke) |
-    set(stroke_cases['ID']) |
-    set(dementia_cases['ID'])
-)
-ids_prs_ad = ids_prs_ad[~ids_prs_ad.isin(exclude)]
-ids_prs_stroke = ids_prs_stroke[~ids_prs_stroke.isin(exclude)]
-
-# Predict for spect_clust_k3
-df_ukb = pd.read_csv(f"../clean_wmh_data/results/spect_clust_k3/wmh_combined.tsv", delimiter="\t")
-df_ukb = df_ukb.drop(columns=['stage_c1', 'stage_c2', 'stage_c3', 'post_ant_subtype', 'post_ant_stage', 'T2star_c1', 'T2star_c2', 'T2star_c3', 'QSM_c1', 'QSM_c2', 'QSM_c3'])
-df_ukb = df_ukb = df_ukb[df_ukb['ID'].isin(set(ids_prs_ad) | set(ids_prs_stroke))]
-df_ukb['group'] = df_ukb['ID'].isin(ids_prs_ad).astype(int)
-
-exclude_cols = ["ID", "age", "sex", "group"]
-feature_cols = [c for c in df_ukb.columns if c not in exclude_cols]
-X_prs = df_ukb[feature_cols].to_numpy()
-X_prs_vol = df_ukb[['WMHvol_c1', 'WMHvol_c2', 'WMHvol_c3']].to_numpy()
-y_prs = df_ukb['group'].to_numpy()
-
-metrics_clust = pred_predict(model_clust, X_prs, y_prs)
-metrics_clust['run'] = "clust_vol_micro"
-metrics_clust_vol = pred_predict(model_clust_vol, X_prs_vol, y_prs)
-metrics_clust_vol['run'] = "clust_vol"
-
-# Predict for pv/deep
-df_ukb = pd.read_csv(f"../clean_wmh_data/results/pv_deep/wmh_combined.tsv", delimiter="\t")
-df_ukb = df_ukb.drop(columns=['pv_deep_T2star_c1', 'pv_deep_T2star_c2', 'pv_deep_QSM_c1', 'pv_deep_QSM_c2'])
-df_ukb = df_ukb = df_ukb[df_ukb['ID'].isin(set(ids_prs_ad) | set(ids_prs_stroke))]
-df_ukb['group'] = df_ukb['ID'].isin(ids_prs_ad).astype(int)
-
-exclude_cols = ["ID", "age", "sex", "group"]
-feature_cols = [c for c in df_ukb.columns if c not in exclude_cols]
-X_prs = df_ukb[feature_cols].to_numpy()
-X_prs_vol = df_ukb[['pv_deep_WMHvol_c1', 'pv_deep_WMHvol_c2']].to_numpy()
-y_prs = df_ukb['group'].to_numpy()
-
-metrics_pvdeep = pred_predict(model_pvdeep, X_prs, y_prs)
-metrics_pvdeep['run'] = "pvdeep_vol_micro"
-metrics_pvdeep_vol = pred_predict(model_pvdeep_vol, X_prs_vol, y_prs)
-metrics_pvdeep_vol['run'] = "pvdeep_vol"
-
-# Predict for no parc
-df_ukb = pd.read_csv(f"../clean_wmh_data/results/no_clust/wmh_combined.tsv", delimiter="\t")
-df_ukb = df_ukb.drop(columns=['stage_c1', 'T2star_c1', 'QSM_c1'])
-df_ukb = df_ukb = df_ukb[df_ukb['ID'].isin(set(ids_prs_ad) | set(ids_prs_stroke))]
-df_ukb['group'] = df_ukb['ID'].isin(ids_prs_ad).astype(int)
-
-exclude_cols = ["ID", "age", "sex", "group"]
-feature_cols = [c for c in df_ukb.columns if c not in exclude_cols]
-X_prs = df_ukb[feature_cols].to_numpy()
-X_prs_vol = df_ukb[['WMHvol_c1']].to_numpy()
-y_prs = df_ukb['group'].to_numpy()
-
-metrics_noparc = pred_predict(model_noparc, X_prs, y_prs)
-metrics_noparc['run'] = "noparc_vol_micro"
-metrics_noparc_vol = pred_predict(model_noparc_vol, X_prs_vol, y_prs)
-metrics_noparc_vol['run'] = "noparc_vol"
-
-# Concat and save
-metrics_all = pd.concat([metrics_clust, metrics_clust_vol, metrics_pvdeep, metrics_pvdeep_vol, metrics_noparc, metrics_noparc_vol])
-metrics_all.to_csv("results/5g_pred_ad_stroke/all_prs_metrics.csv")
 
 #endregion
