@@ -1,6 +1,9 @@
+[![DOI](https://zenodo.org/badge/995559611.svg)](https://doi.org/10.5281/zenodo.18613579)
+
 # Description
 
 Analysis code for the manuscript "Characterizing spatiotemporal white matter hyperintensity pathophysiology in vivo to disentangle vascular and neurodegenerative contributions"
+
 
 We share all analysis code, code used for generating plots, group-level raw results (e.g., 3D volume maps for spatial clusters, linear model outputs, etc.) and visualizations included in the paper.
 
