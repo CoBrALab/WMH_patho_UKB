@@ -1,15 +1,15 @@
 
-# install.packages("Spectrum", lib="/home/parent41/R/x86_64-pc-linux-gnu-library/4.4")
-
 # Load libraries
 
-library(RMINC)
-library(kernlab)
-library(parallel)
-library(Spectrum)
-library(ggplot2)
-library(scales)
-library(data.table)
+suppressPackageStartupMessages({
+    library(RMINC)
+    library(kernlab)
+    library(parallel)
+    library(Spectrum)
+    library(ggplot2)
+    library(scales)
+    library(data.table)
+})
 
 # Use spectral clustering on averaged WMH pathophysiology maps
 

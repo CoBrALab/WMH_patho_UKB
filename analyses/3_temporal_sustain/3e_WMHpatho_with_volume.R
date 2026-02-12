@@ -1,15 +1,17 @@
 
-library(RMINC)
-library(data.table)
-library(matrixStats)
-library(tidyverse)
-library(ggplot2)
-library(splines)
-library(effects)
-library(viridis)
-library(scales)
-library(patchwork)
-library(grid)
+suppressPackageStartupMessages({
+    library(RMINC)
+    library(data.table)
+    library(matrixStats)
+    library(tidyverse)
+    library(ggplot2)
+    library(splines)
+    library(effects)
+    library(viridis)
+    library(scales)
+    library(patchwork)
+    library(grid)
+})
 
 # Associations between WMH pathophysiology and WMH volume 
 # (as an empirical temporal estimate of WMH progression)

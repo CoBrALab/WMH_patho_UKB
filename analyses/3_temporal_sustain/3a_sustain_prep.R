@@ -1,10 +1,10 @@
-
-
-library(data.table)
-library(RMINC)
-library(tidyverse)
-library(ggplot2)
-library(ggridges)
+suppressPackageStartupMessages({
+    library(data.table)
+    library(RMINC)
+    library(tidyverse)
+    library(ggplot2)
+    library(ggridges)
+})
 
 # Prep data to use as sustain inputs
 #   - Invert values for biomarkers which have negative values = more abnormality

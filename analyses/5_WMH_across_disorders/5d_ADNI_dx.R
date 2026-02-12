@@ -1,13 +1,15 @@
 
-library(data.table)
-library(dplyr)
-library(tidyverse)
-library(ggplot2)
-library(patchwork)
-library(RMINC)
-library(MRIcrotome)
-library(viridis)
-library(RColorBrewer)
+suppressPackageStartupMessages({
+    library(data.table)
+    library(dplyr)
+    library(tidyverse)
+    library(ggplot2)
+    library(patchwork)
+    library(RMINC)
+    library(MRIcrotome)
+    library(viridis)
+    library(RColorBrewer)
+})
 
 # Compare the WMHs of cases (ADNI participants with MCI or AD diagnosis) and controls (cognitively unimpaired) with linear models
 

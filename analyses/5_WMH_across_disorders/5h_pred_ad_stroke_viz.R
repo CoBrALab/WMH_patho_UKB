@@ -1,15 +1,17 @@
 
-library(ggplot2)
-library(data.table)
-library(dplyr)
-library(tidyverse)
-library(lme4)
-library(lmerTest)
-library(emmeans)
-library(ggpubr)
-library(patchwork)
-library(multcomp)
-library(rstatix)
+suppressPackageStartupMessages({
+    library(ggplot2)
+    library(data.table)
+    library(dplyr)
+    library(tidyverse)
+    library(lme4)
+    library(lmerTest)
+    library(emmeans)
+    library(ggpubr)
+    library(patchwork)
+    library(multcomp)
+    library(rstatix)
+})
 
 # Load data
 

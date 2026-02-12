@@ -48,6 +48,32 @@ dkt_mapping_filter = dkt_mapping[dkt_mapping['dkt_surf_34_label'].notna()]
 # Function to sample average values of map within volumetric parcels
 # Applied to group averages of AB and Tau PET
 def proc_ad_map(file, parc_vol, parc_surf, name, name_parc, viz):
+    """
+    Process and parcellate neuroimaging maps (e.g., AB and Tau PET).
+    
+    Samples average values within volumetric parcels and projects to surface
+    parcellation for visualization.
+    
+    Parameters
+    ----------
+    file : str
+        Path to neuroimaging file
+    parc_vol : nibabel.Nifti1Image
+        Volumetric parcellation
+    parc_surf : tuple of nibabel.GiftiImage
+        Surface parcellation (left and right hemispheres)
+    name : str
+        Name identifier for the map
+    name_parc : str
+        Parcellation name for output files
+    viz : bool
+        Whether to generate visualization plots
+        
+    Returns
+    -------
+    dict
+        Dictionary containing processed map data and parcellation results
+    """
     print(name)
     # Load data
     print("Load data")
@@ -176,6 +202,22 @@ for c in [1,2,3]:
 
 # Define function
 def spin_test(df):
+    """
+    Generate spatial null models using the Alexander-Bloch spin test.
+    
+    Creates spatially-permuted null distributions that preserve spatial
+    autocorrelation structure for statistical testing of cortical maps.
+    
+    Parameters
+    ----------
+    df : array-like
+        Parcellated cortical data to generate null models for
+        
+    Returns
+    -------
+    ndarray
+        Null distributions from spatial permutations (n_perm x n_parcels)
+    """
     nulls = nmn.alexander_bloch(data=df, atlas='fsaverage', density='164k',
                 n_perm=10000, seed=np.random.choice(10000), parcellation=parc_dkt_fsa)
     return nulls
@@ -197,6 +239,25 @@ for i, name_i in enumerate(conn_gm.keys()):
 
 # Define function
 def spin_test_corr(map1, name):
+    """
+    Correlate a cortical map with WMH cluster connectivity profiles using spin tests.
+    
+    Computes Pearson correlations between input map and each WMH cluster's
+    grey matter connectivity pattern, with p-values corrected for spatial
+    autocorrelation using pre-computed null distributions.
+    
+    Parameters
+    ----------
+    map1 : array-like
+        Parcellated cortical map to correlate with WMH clusters
+    name : str
+        Name of the map for output tracking
+        
+    Returns
+    -------
+    pd.DataFrame
+        Correlation results with columns: x, y, pearson_corr, pearson_p
+    """
     results_corr = pd.DataFrame(columns=['x', 'y', 'pearson_corr', 'pearson_p'])
     # Run correlations
     for c in range(0,3):

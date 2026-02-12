@@ -1,9 +1,10 @@
 
-library(RMINC)
-library(data.table)
-library(matrixStats)
-library(dplyr)
-# library(tidyverse)
+suppressPackageStartupMessages({
+    library(RMINC)
+    library(data.table)
+    library(matrixStats)
+    library(dplyr)
+})
 
 # Calculate subject-wise z-score maps
 # Cannot share the data due to confidentiality of individual participants

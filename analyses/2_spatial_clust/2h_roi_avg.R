@@ -1,7 +1,9 @@
 
-library(data.table)
-library(RMINC)
-library(matrixStats)
+suppressPackageStartupMessages({
+    library(data.table)
+    library(RMINC)
+    library(matrixStats)
+})
 
 # Calculate ROI-based statistics per subject
 # Average WMH pathophysiology per spatial region

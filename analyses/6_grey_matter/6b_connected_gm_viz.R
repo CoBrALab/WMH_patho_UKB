@@ -1,9 +1,11 @@
 
-library(data.table)
-library(dplyr)
-library(tidyverse)
-library(ggplot2)
-library(patchwork)
+suppressPackageStartupMessages({
+    library(data.table)
+    library(dplyr)
+    library(tidyverse)
+    library(ggplot2)
+    library(patchwork)
+})
 
 # Plot spatial correlations in a graph
 

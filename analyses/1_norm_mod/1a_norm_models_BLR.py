@@ -3,8 +3,6 @@ import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-# import seaborn as sns
-# import joypy
 from sklearn.model_selection import train_test_split
 from pcntoolkit.normative import estimate, evaluate, predict
 from pcntoolkit.util.utils import create_bspline_basis, compute_MSLL
@@ -27,6 +25,13 @@ random.seed(123)
 # Paper: https://www.nature.com/articles/s41596-022-00696-5
 # Documentation: https://pcntoolkit.readthedocs.io/en/latest/pages/BLR_normativemodel_protocol.html
 # Github: https://github.com/predictive-clinical-neuroscience/PCNtoolkit-demo/tree/main
+
+# Constants
+MIN_NAWM_VOXELS_UKB = 100  # Minimum number of NAWM voxels required for normative modeling
+MIN_NAWM_VOXELS_ADNI = 5   # Minimum number of NAWM voxels required in ADNI for adaptation
+BSPLINE_ORDER = 3          # B-spline order for age modeling
+BSPLINE_KNOTS = 4          # Number of B-spline knots
+AGE_BUFFER = 5             # Age buffer to add to min/max age for B-spline basis
 
 names = ["dti_FA", "dti_MD", "NODDI_ICVF", "NODDI_ISOVF", "NODDI_OD"]
 new_names = ["FA", "MD", "ICVF", "ISOVF", "OD"]
@@ -115,9 +120,9 @@ print(demo_adni_max81.shape)
 print(micro_adni_max81.shape)
 print(label_adni_max81.shape)
 
-# Add intercept and B-spline with age to demo (add 5 to min and max, according to PCN tutorial at OHBM)
+# Add intercept and B-spline with age to demo
 # https://github.com/predictive-clinical-neuroscience/NM_educational_OHBM24/blob/main/slot1_Fraza/1_fit_normative_models.ipynb)
-B = create_bspline_basis(demo_ukb['Age'].min() - 5, demo_ukb['Age'].max() + 5, p=3, nknots = 4)
+B = create_bspline_basis(demo_ukb['Age'].min() - AGE_BUFFER, demo_ukb['Age'].max() + AGE_BUFFER, p=BSPLINE_ORDER, nknots=BSPLINE_KNOTS)
 
 # UKB
 Phi = np.array([B(i) for i in demo_ukb.iloc[:,2]])
@@ -158,8 +163,24 @@ all_columns_adni = metrics_columns + male_means_columns + male_sd_columns + fema
 
 # Iterate over voxels
 def run_nm(i):
+    """
+    Run normative modeling for a single voxel.
+    
+    Fits a Bayesian Linear Regression model on UKB NAWM data, transfers the model
+    to ADNI data through adaptation, and computes age- and sex-specific predictions.
+    
+    Parameters
+    ----------
+    i : int
+        Voxel index in the microstructure matrix
+        
+    Returns
+    -------
+    tuple of (pd.DataFrame, pd.DataFrame)
+        res_ukb : UKB results with model metrics and predictions
+        res_adni : ADNI results with transferred model predictions
+    """
     print(i)
-    # i = 23045
     os.makedirs(f'/dev/shm/parent41/nm_n{name}/tmp/v{i}', exist_ok=True)
     # Select voxel
     vox_ukb = micro_ukb.iloc[:,i]
@@ -171,8 +192,8 @@ def run_nm(i):
     print(f'Number of voxels for specific tissue type in voxel = {count_tissue_voxels_ukb} - {count_tissue_voxels_adni_adapt}')
     res_ukb = pd.DataFrame(np.zeros((1, len(all_columns_ukb))), columns=all_columns_ukb)
     res_adni = pd.DataFrame(np.zeros((1, len(all_columns_adni))), columns=all_columns_adni)
-    # If less than 100 NAWM labels, return NaNs
-    if count_tissue_voxels_ukb < 100 or count_tissue_voxels_adni_adapt < 5:
+    # If insufficient NAWM labels, return NaNs
+    if count_tissue_voxels_ukb < MIN_NAWM_VOXELS_UKB or count_tissue_voxels_adni_adapt < MIN_NAWM_VOXELS_ADNI:
         # Results UKB
         res_ukb.iloc[0,:] = np.full(len(all_columns_ukb), np.nan)
         res_ukb['ROI'] = i
@@ -181,8 +202,8 @@ def run_nm(i):
         res_adni.iloc[0,:] = np.full(len(all_columns_adni), np.nan)
         res_adni['ROI'] = i
         res_adni['N'] = count_tissue_voxels_ukb
-    # If more or equal to 100 NAWM labels, run normative modeling
-    if count_tissue_voxels_ukb >= 100 and count_tissue_voxels_adni_adapt >= 5:
+    # If sufficient NAWM labels, run normative modeling
+    if count_tissue_voxels_ukb >= MIN_NAWM_VOXELS_UKB and count_tissue_voxels_adni_adapt >= MIN_NAWM_VOXELS_ADNI:
         # Concatenate with demo
         vox_ukb = pd.concat([demo_ukb_pd, vox_ukb], axis=1)
         vox_adni_adapt = pd.concat([demo_adni_pd_adapt, vox_adni_adapt], axis=1)

@@ -1,9 +1,11 @@
 
-library(data.table)
-library(RMINC)
-library(tidyverse)
-library(MRIcrotome)
-library(viridis)
+suppressPackageStartupMessages({
+    library(data.table)
+    library(RMINC)
+    library(tidyverse)
+    library(MRIcrotome)
+    library(viridis)
+})
 
 # Assign voxels that were previously excluded due to low NAWM or WMH prevalence
 # to closest spatial cluster using a search area strategy
@@ -12,7 +14,9 @@ dir.create("./results/2d_assign_excluded_voxels", showWarnings=FALSE)
 dir.create("./visualization/2d_assign_excluded_voxels", showWarnings=FALSE)
 
 # Load WMH and NAWM prevalence
-wmh_thresh = 30
+# Threshold for minimum prevalence counts (same as in 2a_make_averages.R)
+WMH_MIN_PREVALENCE = 30
+wmh_thresh = WMH_MIN_PREVALENCE
 nawm_thresh = 5000
 
 mask=mincGetVolume("../../data/WMH_mask.mnc")
