@@ -1,9 +1,11 @@
 
-library(data.table)
-library(RMINC)
-library(tidyverse)
-library(ggplot2)
-library(patchwork)
+suppressPackageStartupMessages({
+    library(data.table)
+    library(RMINC)
+    library(tidyverse)
+    library(ggplot2)
+    library(patchwork)
+})
 
 # Clean and combine WMH data
 #   - log-transform WMH volumes

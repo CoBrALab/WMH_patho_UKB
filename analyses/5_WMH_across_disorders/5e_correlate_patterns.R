@@ -1,13 +1,15 @@
 
-library(data.table)
-library(tidyverse)
-library(dplyr)
-library(ggplot2)
-library(viridis)
-library(reshape2)
-library(dendextend)
-library(RColorBrewer)
-library(cowplot)
+suppressPackageStartupMessages({
+    library(data.table)
+    library(tidyverse)
+    library(dplyr)
+    library(ggplot2)
+    library(viridis)
+    library(reshape2)
+    library(dendextend)
+    library(RColorBrewer)
+    library(cowplot)
+})
 
 # Correlate effect size patterns across analysis schemes (UKB diagnoses, UKB PRS, ADNI diagnoses)
 

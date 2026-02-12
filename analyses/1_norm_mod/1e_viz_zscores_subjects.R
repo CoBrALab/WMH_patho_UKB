@@ -1,7 +1,9 @@
 
-library(RMINC)
-library(data.table)
-library(ggplot2)
+suppressPackageStartupMessages({
+    library(RMINC)
+    library(data.table)
+    library(ggplot2)
+})
 
 # Visualize the WMH z-scores of 10 subjects with highest WMH volumes in UKB
 # Cannot share the data due to confidentiality of individual participants
