@@ -1,23 +1,23 @@
 
-# install.packages("Spectrum", lib="/home/parent41/R/x86_64-pc-linux-gnu-library/4.4")
-
 # Load libraries
 
-library(RMINC)
-library(kernlab)
-library(forcats)
-library(parallel)
-library(Spectrum)
-library(ggplot2)
-library(scales)
-library(data.table)
-library(dplyr)
-library(grid)
-library(gridExtra)
-library(tidyverse)
-library(MRIcrotome)
-library(magrittr)
-library(viridis)
+suppressPackageStartupMessages({
+    library(RMINC)
+    library(kernlab)
+    library(forcats)
+    library(parallel)
+    library(Spectrum)
+    library(ggplot2)
+    library(scales)
+    library(data.table)
+    library(dplyr)
+    library(grid)
+    library(gridExtra)
+    library(tidyverse)
+    library(MRIcrotome)
+    library(magrittr)
+    library(viridis)
+})
 library(broom)
 
 # Visualization tools for spatial WMH clusters

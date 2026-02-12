@@ -1,17 +1,19 @@
 
 # Load libraries
 
-library(RMINC)
-library(ggplot2)
-library(scales)
-library(data.table)
-library(dplyr)
-library(grid)
-library(gridExtra)
-library(tidyverse)
-library(MRIcrotome)
-library(magrittr)
-library(viridis)
+suppressPackageStartupMessages({
+    library(RMINC)
+    library(ggplot2)
+    library(scales)
+    library(data.table)
+    library(dplyr)
+    library(grid)
+    library(gridExtra)
+    library(tidyverse)
+    library(MRIcrotome)
+    library(magrittr)
+    library(viridis)
+})
 
 # Quantify dice overlap between our data-driven clusters with other holistic parcellations
 

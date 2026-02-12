@@ -1,21 +1,23 @@
 
 # Load libraries
 
-library(RMINC)
-library(kernlab)
-library(parallel)
-library(Spectrum)
-library(ggplot2)
-library(scales)
-library(data.table)
-library(dplyr)
-library(grid)
-library(gridExtra)
-library(tidyverse)
-library(MRIcrotome)
-library(magrittr)
-library(viridis)
-library(broom)
+suppressPackageStartupMessages({
+    library(RMINC)
+    library(kernlab)
+    library(parallel)
+    library(Spectrum)
+    library(ggplot2)
+    library(scales)
+    library(data.table)
+    library(dplyr)
+    library(grid)
+    library(gridExtra)
+    library(tidyverse)
+    library(MRIcrotome)
+    library(magrittr)
+    library(viridis)
+    library(broom)
+})
 
 # Visualization tools for spatial WMH clusters
 

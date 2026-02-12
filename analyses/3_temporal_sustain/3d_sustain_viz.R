@@ -1,16 +1,18 @@
 
-library(data.table)
-library(ggplot2)
-library(tidyverse)
-library(viridis)
-library(patchwork)
-library(grid)
-library(Matrix)
-library(RMINC)
-library(gridExtra) 
-library(MRIcrotome)
-library(magrittr)
-library(RColorBrewer)
+suppressPackageStartupMessages({
+    library(data.table)
+    library(ggplot2)
+    library(tidyverse)
+    library(viridis)
+    library(patchwork)
+    library(grid)
+    library(Matrix)
+    library(RMINC)
+    library(gridExtra) 
+    library(MRIcrotome)
+    library(magrittr)
+    library(RColorBrewer)
+})
 
 # Visualize SuStaIn outputs
 # Customized plotting with ggplot

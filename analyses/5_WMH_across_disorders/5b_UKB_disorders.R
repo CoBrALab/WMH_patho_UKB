@@ -1,18 +1,20 @@
 
-library(data.table)
-library(effsize)
-library(ggplot2)
-library(tidyverse)
-library(dplyr)
-library(scales)
-library(forcats)
-library(cowplot)
-library(patchwork)
-library(MRIcrotome)
-library(magrittr)
-library(viridis)
-library(RColorBrewer)
-library(RMINC)
+suppressPackageStartupMessages({
+    library(data.table)
+    library(effsize)
+    library(ggplot2)
+    library(tidyverse)
+    library(dplyr)
+    library(scales)
+    library(forcats)
+    library(cowplot)
+    library(patchwork)
+    library(MRIcrotome)
+    library(magrittr)
+    library(viridis)
+    library(RColorBrewer)
+    library(RMINC)
+})
 
 # Compare the WMHs of cases (UKB ICD-10 diagnoses) and controls with linear models
 
@@ -29,7 +31,6 @@ firstocc = merge(inclusions, firstocc, by="ID", all.x=TRUE)
 firstocc[,c(3,4,7,8)] = as.data.frame(lapply(firstocc[,c(3,4,7,8)], as.factor))
 firstocc[,c(2,5)] = as.data.frame(lapply(firstocc[,c(2,5)], as.Date))
 
-# wmh = as.data.frame(fread("../3_temporal_sustain/results/3f_clean_wmh_data/wmh_combined.tsv"))
 wmh = as.data.frame(fread("../../../WMH_micro_spatial/Analyses_nm/clean_wmh_data/results/spect_clust_k3/wmh_combined.tsv"))
 wmh$sex = as.factor(wmh$sex)
 
