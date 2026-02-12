@@ -1,17 +1,19 @@
 
-library(data.table)
-library(ggplot2)
-library(tidyverse)
-library(dplyr)
-library(scales)
-library(MRIcrotome)
-library(magrittr)
-library(viridis)
-library(RColorBrewer)
-library(RMINC)
-library(ggsignif)
-library(patchwork)
-library(effects)
+suppressPackageStartupMessages({
+    library(data.table)
+    library(ggplot2)
+    library(tidyverse)
+    library(dplyr)
+    library(scales)
+    library(MRIcrotome)
+    library(magrittr)
+    library(viridis)
+    library(RColorBrewer)
+    library(RMINC)
+    library(ggsignif)
+    library(patchwork)
+    library(effects)
+})
 
 # Sex differences in WMH pathophysiology
 

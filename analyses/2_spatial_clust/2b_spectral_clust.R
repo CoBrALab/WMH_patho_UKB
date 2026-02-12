@@ -1,12 +1,14 @@
 # Load libraries
 
-library(RMINC)
-library(kernlab)
-library(parallel)
-library(Spectrum)
-library(ggplot2)
-library(scales)
-library(data.table)
+suppressPackageStartupMessages({
+    library(RMINC)
+    library(kernlab)
+    library(parallel)
+    library(Spectrum)
+    library(ggplot2)
+    library(scales)
+    library(data.table)
+})
 
 # Use spectral clustering on averaged WMH pathophysiology maps
 
@@ -17,8 +19,12 @@ dir.create("./visualization/2b_spectral_clust", showWarnings=FALSE)
 
 maps=c("FA", "MD", "ICVF", "ISOVF", "OD", "T2star", "QSM")
 
-wmh_thresh = 30
-nawm_thresh = 5000
+# Thresholds for minimum prevalence counts (same as in 2a_make_averages.R)
+WMH_MIN_PREVALENCE = 30
+NAWM_MIN_PREVALENCE = 5000
+
+wmh_thresh = WMH_MIN_PREVALENCE
+nawm_thresh = NAWM_MIN_PREVALENCE
 
 df = fread(paste0("./results/2a_make_averages/WMH_zscore_",maps[1],"_avg.tsv"))
 

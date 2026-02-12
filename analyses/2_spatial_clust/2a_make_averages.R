@@ -1,17 +1,19 @@
 
-library(RMINC)
-library(data.table)
-library(matrixStats)
-library(grid)
-library(gridExtra) 
-library(tidyverse)
-library(MRIcrotome)
-library(magrittr)
-library(viridis)
-library(RColorBrewer)
-library(ggplot2)
-library(dplyr)
-library(patchwork)
+suppressPackageStartupMessages({
+    library(RMINC)
+    library(data.table)
+    library(matrixStats)
+    library(grid)
+    library(gridExtra) 
+    library(tidyverse)
+    library(MRIcrotome)
+    library(magrittr)
+    library(viridis)
+    library(RColorBrewer)
+    library(ggplot2)
+    library(dplyr)
+    library(patchwork)
+})
 
 # Make between-subject averages of WMH zscore maps
 
@@ -30,8 +32,12 @@ prev = as.data.frame(fread("../../../WMH_micro_spatial/Analyses_nm/tissue_preval
 nawm_prev = as.numeric(prev[8,])
 wmh_prev = as.numeric(prev[9,])
 
-wmh_thresh = 30
-nawm_thresh = 5000
+# Thresholds for minimum prevalence counts
+WMH_MIN_PREVALENCE = 30
+NAWM_MIN_PREVALENCE = 5000
+
+wmh_thresh = WMH_MIN_PREVALENCE
+nawm_thresh = NAWM_MIN_PREVALENCE
 
 # Iterate for each microstructural marker
 for (m in 1:length(names)) {

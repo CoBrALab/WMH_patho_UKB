@@ -1,15 +1,17 @@
 
-library(data.table)
-library(RMINC)
-library(grid)
-library(gridExtra) 
-library(tidyverse)
-library(MRIcrotome)
-library(magrittr)
-library(viridis)
-library(RColorBrewer)
-library(ggplot2)
-library(patchwork)
+suppressPackageStartupMessages({
+    library(data.table)
+    library(RMINC)
+    library(grid)
+    library(gridExtra) 
+    library(tidyverse)
+    library(MRIcrotome)
+    library(magrittr)
+    library(viridis)
+    library(RColorBrewer)
+    library(ggplot2)
+    library(patchwork)
+})
 
 # Visualize normative models of a few voxels
 
@@ -78,13 +80,9 @@ plot_vox = function(nm_df, df_wmh, df_nawm, name, ymax, ymin) {
 
     plt = ggplot() +
             stat_density_2d(data=df_nawm, aes(x=Age, y=Value, fill = after_stat(density)), geom = "raster", alpha = 0.5, contour = FALSE) + 
-            geom_line(data = nm_df, aes(x=Age, y=avg, linetype=Sex_nm), color="black", size=1)
+            geom_line(data = nm_df, aes(x=Age, y=avg, linetype=Sex_nm), color="black", size=1) +
             geom_point(data=df_wmh, aes(x=Age, y=Value, color=Sex), alpha=0.5, size=2) +
             scale_fill_viridis_c(name="              ") +   
-            # geom_point(data=df_wmh, aes(x=Age, y=Value, shape=Sex), alpha=0.5, size=2, color="blue") + 
-            # scale_shape_discrete(name="Sex (WMH data)") + 
-            # geom_line(data = nm_df, aes(x=Age, y=avg, linetype=Sex_nm), color="red", size=1) + 
-            # scale_linetype_discrete(name="Sex (NAWM pred)") + 
             ggtitle(names[n]) +
             scale_y_continuous(name="Value", limits=c(ymin, ymax)) +
             scale_x_continuous(name="Age") +
